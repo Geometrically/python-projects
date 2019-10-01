@@ -30,7 +30,10 @@ def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
             y = column * brickHeight + column * mortarWidth
 
             if column % 2:
-                drawRect(x + brickWidth/2 - brickWidth, y, brickWidth, brickHeight)
+                if row == 0 or row == (rows - 1):
+                    drawRect(x + brickWidth/2 - brickWidth - mortarWidth/2, y, brickWidth, brickHeight)
+                else:
+                    drawRect(x + brickWidth/2 - brickWidth - mortarWidth/2, y, brickWidth, brickHeight)
             else:
                 drawRect(x, y, brickWidth, brickHeight)
 
@@ -44,5 +47,5 @@ def drawBrickWall(rows, cols, brickWidth, brickHeight, mortarWidth):
             drawRect(x, y, brickWidth, brickHeight)
 
 
-drawBrickWallOffset(10, 10, 50, 25, 8)
+drawBrickWallOffset(4, 3, 50, 25, 8)
 turtle.done()
