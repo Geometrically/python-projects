@@ -8,6 +8,7 @@ pointer = turtle.Turtle()
 pointer.up()
 pointer.hideturtle()
 pointer.speed(0)
+pointer.color("red")
 
 
 def drawRect(x, y, length, height):
