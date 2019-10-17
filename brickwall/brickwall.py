@@ -10,7 +10,6 @@ pointer.hideturtle()
 pointer.speed(0)
 pointer.color("red")
 
-
 def drawRect(x, y, length, height):
     pointer.up()
     pointer.goto(x, y)
@@ -23,7 +22,12 @@ def drawRect(x, y, length, height):
     pointer.up()
     pointer.end_fill()
 
-
+def drawBrickWallPattern(rows, cols, brickWidth, brickHeight, mortarWidth):
+    for row in range(rows):
+        for column in range(cols):
+            if(column % 2):
+                drawBrickWall(1, 2, brickWidth, brickHeight, mortarWidth, row * brickWidth + row * mortarWidth, column * brickHeight + column * mortarWidth)
+                 
 def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
     for row in range(rows):
         for column in range(cols):
@@ -42,14 +46,14 @@ def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
                 drawRect(x, y, brickWidth, brickHeight)
 
 
-def drawBrickWall(rows, cols, brickWidth, brickHeight, mortarWidth):
+def drawBrickWall(rows, cols, brickWidth, brickHeight, mortarWidth, xOffset, yOffset):
     for row in range(rows):
         for column in range(cols):
-            x = row * brickWidth + row * mortarWidth
-            y = column * brickHeight + column * mortarWidth
+            x = xOffset + row * brickWidth + row * mortarWidth
+            y = yOffset +  column * brickHeight + column * mortarWidth
 
             drawRect(x, y, brickWidth, brickHeight)
 
 
-drawBrickWallOffset(4, 3, 50, 25, 30)
+drawBrickWallPattern(2, 2, 50, 25, 5)
 turtle.done()
