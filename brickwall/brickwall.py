@@ -1,4 +1,11 @@
 import turtle
+import random
+
+rgb = ["green","red","blue","dark red","sky blue","cyan","dark cyan",
+       "light sky blue","dark blue","powder blue","medium spring green"
+       ,"yellow green","yellow","violet","goldenrod","deep pink","pink","indian red",
+       "dark magenta","dark magenta","brown","slate blue","magenta","blue violet","khaki",
+       "peru","orange","salmon","medium violet red","chartreuse","dark slate gray","orange"]
 
 screen = turtle.Screen()
 screen.screensize(400, 400)
@@ -8,7 +15,6 @@ pointer = turtle.Turtle()
 pointer.up()
 pointer.hideturtle()
 pointer.speed(0)
-pointer.color("red")
 
 def drawRect(x, y, length, height):
     pointer.up()
@@ -22,17 +28,31 @@ def drawRect(x, y, length, height):
     pointer.up()
     pointer.end_fill()
 
-def drawBrickWallPattern(rows, cols, brickWidth, brickHeight, mortarWidth):
+def drawBrickWallPattern(rows, cols, brickWidth, brickHeight, mortarWidth):    
     for row in range(rows):
         for column in range(cols):
-            if(column % 2):
-                drawBrickWall(1, 2, brickWidth, brickHeight, mortarWidth, row * brickWidth + row * mortarWidth, column * brickHeight + column * mortarWidth)
-                 
+            pointer.color(random.choice(rgb))
+            
+            x = row * brickWidth + row * mortarWidth;
+            y = column * brickWidth + column * 2 * mortarWidth
+                
+            if(column % 2 and not row % 2):
+                drawBrickWall(1, 2, brickWidth, brickHeight, mortarWidth, x, y)
+            elif(row % 2 and not column % 2):
+                drawBrickWall(1, 2, brickWidth, brickHeight, mortarWidth, x, y)
+            else:             
+                x2 = x + brickHeight + mortarWidth/2;
+                
+                drawRect(x, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth)
+                drawRect(x2, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth)
+                
 def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
     for row in range(rows):
         for column in range(cols):
             x = row * brickWidth + row * mortarWidth
             y = column * brickHeight + column * mortarWidth
+            
+            pointer.color(random.choice(rgb))
 
             if column % 2:
                 if row == 0:
@@ -49,11 +69,13 @@ def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
 def drawBrickWall(rows, cols, brickWidth, brickHeight, mortarWidth, xOffset, yOffset):
     for row in range(rows):
         for column in range(cols):
+            pointer.color(random.choice(rgb))
+
             x = xOffset + row * brickWidth + row * mortarWidth
             y = yOffset +  column * brickHeight + column * mortarWidth
 
             drawRect(x, y, brickWidth, brickHeight)
 
 
-drawBrickWallPattern(2, 2, 50, 25, 5)
+drawBrickWallPattern(2, 2, 100, 50, 5)
 turtle.done()
