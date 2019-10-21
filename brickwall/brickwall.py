@@ -28,25 +28,47 @@ def drawRect(x, y, length, height):
     pointer.up()
     pointer.end_fill()
 
-def drawBrickWallPattern(rows, cols, brickWidth, brickHeight, mortarWidth):    
+def drawHalfBasketWeave(rows, cols, brickWidth, mortarWidth):    
+    for row in range(rows):
+        for column in range(cols):
+            pointer.color(random.choice(rgb))
+            
+            brickHeight = brickWidth/2
+
+            x = row * brickWidth + row * mortarWidth;
+            y = column * brickWidth + column * 2 * mortarWidth
+                            
+            if(column % 2 and not row % 2):
+                drawRect(x, y, brickWidth, brickHeight)
+            elif(row % 2 and not column % 2):
+                drawRect(x, y, brickWidth, brickHeight)
+            else:             
+                x2 = x + brickHeight + mortarWidth/2;
+                
+                drawRect(x, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth)
+                drawRect(x2, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth) 
+                
+def drawBasketWeave(rows, cols, brickWidth, mortarWidth):    
     for row in range(rows):
         for column in range(cols):
             pointer.color(random.choice(rgb))
             
             x = row * brickWidth + row * mortarWidth;
             y = column * brickWidth + column * 2 * mortarWidth
+            
+            brickHeight = brickWidth/2
                 
             if(column % 2 and not row % 2):
-                drawBrickWall(1, 2, brickWidth, brickHeight, mortarWidth, x, y)
+                drawJackOnJack(1, 2, brickWidth, brickHeight, mortarWidth, x, y)
             elif(row % 2 and not column % 2):
-                drawBrickWall(1, 2, brickWidth, brickHeight, mortarWidth, x, y)
+                drawJackOnJack(1, 2, brickWidth, brickHeight, mortarWidth, x, y)
             else:             
                 x2 = x + brickHeight + mortarWidth/2;
                 
                 drawRect(x, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth)
-                drawRect(x2, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth)
+                drawRect(x2, y, brickHeight - mortarWidth/2, brickWidth + mortarWidth) 
                 
-def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
+def drawRunningWeave(rows, cols, brickWidth, brickHeight, mortarWidth):
     for row in range(rows):
         for column in range(cols):
             x = row * brickWidth + row * mortarWidth
@@ -66,7 +88,7 @@ def drawBrickWallOffset(rows, cols, brickWidth, brickHeight, mortarWidth):
                 drawRect(x, y, brickWidth, brickHeight)
 
 
-def drawBrickWall(rows, cols, brickWidth, brickHeight, mortarWidth, xOffset, yOffset):
+def drawJackOnJack(rows, cols, brickWidth, brickHeight, mortarWidth, xOffset, yOffset):
     for row in range(rows):
         for column in range(cols):
             pointer.color(random.choice(rgb))
@@ -77,5 +99,5 @@ def drawBrickWall(rows, cols, brickWidth, brickHeight, mortarWidth, xOffset, yOf
             drawRect(x, y, brickWidth, brickHeight)
 
 
-drawBrickWallPattern(2, 2, 100, 50, 5)
+drawHalfBasketWeave(10, 5, 25, 5)
 turtle.done()
