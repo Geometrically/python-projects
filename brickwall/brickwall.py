@@ -38,6 +38,16 @@ def drawHalfBasketWeave(rows, cols, brickWidth, mortarWidth):
             x = row * brickWidth + row * mortarWidth;
             y = column * brickWidth + column * 2 * mortarWidth
             
+            if(column != 0 and column != 1):
+                multiplier = column - 1
+                 
+                if(not multiplier % 2):
+                    multiplier -= 1
+                
+                if(multiplier > 2):
+                    multiplier = (multiplier + 1)/2
+                
+                y -= multiplier * brickHeight + multiplier * mortarWidth
                             
             if(column % 2 and not row % 2):               
                 drawRect(x, y, brickWidth, brickHeight)
@@ -45,7 +55,7 @@ def drawHalfBasketWeave(rows, cols, brickWidth, mortarWidth):
                 drawRect(x, y, brickWidth, brickHeight)
             else:
                 if(row % 2 and row != 0):
-                    y -= brickHeight*2 - mortarWidth*1.5
+                    y -= brickHeight*2 - mortarWidth* 2
                              
                 x2 = x + brickHeight + mortarWidth/2;
                 
@@ -95,5 +105,5 @@ def drawJackOnJack(rows, cols, brickWidth, brickHeight, mortarWidth, xOffset, yO
 
             drawRect(x, y, brickWidth, brickHeight)
 
-
+drawHalfBasketWeave(10, 12, 30, 5)
 turtle.done()
