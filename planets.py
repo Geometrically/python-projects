@@ -1,57 +1,53 @@
 import math
 import turtle
 
-gravity = 6.67430e-11
+def distance(x1,y1,x2,y2):
+    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
-def Distance(x1, x2, y1, y2):
-    offset1 = (x2 - x1)**2
-    offset2 = (y2 - y1)**2
-    
-    return math.sqrt(offset1 + offset2)
-
-def Gravity(mass1, x1, y1, mass2, x2, y2):
-    return mass1 * mass2 * gravity / Distance(x1, y1, mass2, x2, y2)**2
+def grav_mag(m1,x1,y1,m2,x2,y2):
+    return m1*m2/distance(x1,y1,x2,y2)**2
 
 screen = turtle.Screen()
 screen.screensize(700,700)
-screen.setworldcoordinates(-5, -5, 5, 5)
+screen.setworldcoordinates(-5,-5,5,5)
 
-mass1 = 1
-mass2 = 1
+t_step = .001
 
-x1, y1 = -3, 0
-x2, y2 = 3, 0
+planet1 = Planet(1, Vector2(-3, 0), Vector2(0, .25), "red")
+planet2 = Planet(1, Vector2(3, 0), Vector2(0, -.25), "green")
 
-vx1, vy1 = 0, .25
-vx2, vy2 = 0, -.25
-
-
-pointer2 = turtle.Turtle()
-pointer2.up()
-pointer2.shape("circle")
-pointer2.color("green")
-pointer2.speed(0)
-pointer2.goto(x2, y2)
-pointer2.down()
-
-t_step = 0.1
+i=0
 
 while True:
-    f12 = Gravity(mass1, x1, y1, mass2, x2, y2)
-    f12_theta = math.atan2(y2 - y1, x2 - x1)
+    f12 = grav_mag(planet1.mass, planet1.position.x, planet1.position.y, planet2.mass, planet2.position.x, planet2.position.y)
     
-    x1,y1 = vx1*t_step + x1, vy1*t_step + y1
-    x2,y2 = vx2*t_step + x2, vy2*t_step + y2
+    planetMassOffset = planet1.mass - planet2.mass
+    f12_theta = math.atan2(planetMassOffset.y, planetMassOffset.x)
+   
+    x1, y1 = vx1*t_step+x1, vy1*t_step+y1
+    x2, y2 = vx2*t_step+x2, vy2*t_step+y2
+   
+    vx1, vy1 = f12*math.cos(f12_theta)/m1*t_step + vx1,f12*math.sin(f12_theta)/m1*t_step + vy1
+    vx2, vy2 = f12*math.cos(f12_theta+math.pi)/m2*t_step + vx2,f12*math.sin(f12_theta+math.pi)/m2*t_step + vy2
+   
+    if i%1000 ==0:
+        pointer1.goto(x1,y1)
+        pointer2.goto(x2,y2)
+        
+    i+=1
+    
 
-class Planet(object):
+class Planet:
     
-    def __init__(self, position, velocity, color):
+    def __init__(self, mass, position, velocity, color):
         self.position = position
         self.velocity = velocity
-                
+        self.mass = mass
+        
         pointer = turtle.Turtle()
         self.pointer = pointer
         
+        pointer = turtle.Turtle()
         pointer.up()
         pointer.shape("circle")
         pointer.color(color)
@@ -59,14 +55,17 @@ class Planet(object):
         pointer.goto(position.x, position.y)
         pointer.down()
         
-    def SetVelocity(self, velocity):
-        self.velocity = velocity
-        
-    def SetPosition(self, position):
-        self.position = position
-        
-class Vector2(object):
+class Vector2:
     
     def __init__(self, x, y):
         self.x = x
         self.y = y
+    
+    def __add__(self, other):
+        return Vector2(self.x + other.x, self.y + other.y)
+    
+    def __sub__(self, other):
+        return Vector2(self.x - other.x, self.y - other.y)
+    
+    def __mul__(self, other):
+        return Vector2(self.x * other.x, self.y * other.y)
