@@ -1,11 +1,13 @@
 import math
 import turtle
+import util
 
-def distance(x1,y1,x2,y2):
-    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
-def grav_mag(m1,x1,y1,m2,x2,y2):
-    return m1*m2/distance(x1,y1,x2,y2)**2
+def distance(pointA, pointB):
+    return math.sqrt((pointB.x-pointA.x)**2 + (pointB.y-pointA.y)**2)
+
+def grav_mag(planetA, planetB):
+    return planetA.mass*planetB.mass/distance(planetA.position, planetB.position)**2
 
 screen = turtle.Screen()
 screen.screensize(700,700)
@@ -13,59 +15,49 @@ screen.setworldcoordinates(-5,-5,5,5)
 
 t_step = .001
 
-planet1 = Planet(1, Vector2(-3, 0), Vector2(0, .25), "red")
-planet2 = Planet(1, Vector2(3, 0), Vector2(0, -.25), "green")
+planet3 = util.Planet(1, util.Vector2(0, 0), util.Vector2(0.93240737, -0.86473146), "green")
+planet1 = util.Planet(1, util.Vector2(0.97200436, -0.24308753), util.Vector2(-planet3.velocity.x/2, -planet3.velocity.y/2), "red")
+planet2 = util.Planet(1, util.Vector2(-planet1.position.x, -planet1.position.y), planet1.velocity, "green")
 
 i=0
 
 while True:
-    f12 = grav_mag(planet1.mass, planet1.position.x, planet1.position.y, planet2.mass, planet2.position.x, planet2.position.y)
+    f12 = grav_mag(planet1, planet2)
+    f23 = grav_mag(planet2, planet3)
+    f13 = grav_mag(planet1, planet3)
+
+    planet12PosOffset = planet2.position - planet1.position
+    planet23PosOffset = planet3.position - planet2.position
+    planet13PosOffset = planet3.position - planet1.position
     
-    planetMassOffset = planet1.mass - planet2.mass
-    f12_theta = math.atan2(planetMassOffset.y, planetMassOffset.x)
+    f12_theta = math.atan2(planet12PosOffset.y, planet12PosOffset.x)
+    f23_theta = math.atan2(planet23PosOffset.y, planet23PosOffset.x)
+    f13_theta = math.atan2(planet13PosOffset.y, planet13PosOffset.x)
+
    
-    x1, y1 = vx1*t_step+x1, vy1*t_step+y1
-    x2, y2 = vx2*t_step+x2, vy2*t_step+y2
-   
-    vx1, vy1 = f12*math.cos(f12_theta)/m1*t_step + vx1,f12*math.sin(f12_theta)/m1*t_step + vy1
-    vx2, vy2 = f12*math.cos(f12_theta+math.pi)/m2*t_step + vx2,f12*math.sin(f12_theta+math.pi)/m2*t_step + vy2
+    planet1.position = util.Vector2(
+        planet1.velocity.x * t_step + planet1.position.x,
+        planet1.velocity.y * t_step + planet1.position.y)
+    
+    planet2.position = util.Vector2(
+        planet2.velocity.x * t_step + planet2.position.x, 
+        planet2.velocity.y * t_step + planet2.position.y)
+
+    planet1.velocity = util.Vector2(
+        (f12*math.cos(f12_theta) + f13*math.cos(f13_theta))/planet1.mass*t_step + planet1.velocity.x,
+        (f12*math.cos(f12_theta) + f13*math.cos(f13_theta))/planet1.mass*t_step + planet1.velocity.y)
+    
+    planet2.velocity = util.Vector2(
+        (f12*math.cos(f12_theta + math.pi) + f23*math.cos(f23_theta))/planet2.mass*t_step + planet2.velocity.x,
+        (f12*math.cos(f12_theta + math.pi) + f23*math.cos(f23_theta))/planet2.mass*t_step + planet2.velocity.y)
+
+    planet3.velocity = util.Vector2(
+        (f23*math.cos(f23_theta + math.pi) + f13*math.cos(f13_theta + math.pi))/planet3.mass*t_step + planet3.velocity.x,
+        (f23*math.cos(f23_theta + math.pi) + f13*math.cos(f13_theta + math.pi))/planet3.mass*t_step + planet3.velocity.y)
    
     if i%1000 ==0:
-        pointer1.goto(x1,y1)
-        pointer2.goto(x2,y2)
+        planet1.pointer.goto(planet1.position.x,planet1.position.y)
+        planet2.pointer.goto(planet2.position.x, planet2.position.y)
+        planet3.pointer.goto(planet3.position.x, planet3.position.y)
         
     i+=1
-    
-
-class Planet:
-    
-    def __init__(self, mass, position, velocity, color):
-        self.position = position
-        self.velocity = velocity
-        self.mass = mass
-        
-        pointer = turtle.Turtle()
-        self.pointer = pointer
-        
-        pointer = turtle.Turtle()
-        pointer.up()
-        pointer.shape("circle")
-        pointer.color(color)
-        pointer.speed(0)
-        pointer.goto(position.x, position.y)
-        pointer.down()
-        
-class Vector2:
-    
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    
-    def __add__(self, other):
-        return Vector2(self.x + other.x, self.y + other.y)
-    
-    def __sub__(self, other):
-        return Vector2(self.x - other.x, self.y - other.y)
-    
-    def __mul__(self, other):
-        return Vector2(self.x * other.x, self.y * other.y)
