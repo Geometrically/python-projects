@@ -15,7 +15,7 @@ screen.setworldcoordinates(-5,-5,5,5)
 
 t_step = .001
 
-planet3 = util.Planet(1, util.Vector2(0, 0), util.Vector2(0.93240737, -0.86473146), "green")
+planet3 = util.Planet(1, util.Vector2(0, 0), util.Vector2(-0.93240737, -0.86473146), "green")
 planet1 = util.Planet(1, util.Vector2(0.97000436, -0.24308753), util.Vector2(-planet3.velocity.x/2, -planet3.velocity.y/2), "red")
 planet2 = util.Planet(1, util.Vector2(-planet1.position.x, -planet1.position.y), planet1.velocity, "blue")
 
@@ -59,7 +59,7 @@ while True:
         (f23*math.cos(f23_theta + math.pi) + f13*math.cos(f13_theta + math.pi))/planet3.mass*t_step + planet3.velocity.x,
         (f23*math.sin(f23_theta + math.pi) + f13*math.sin(f13_theta + math.pi))/planet3.mass*t_step + planet3.velocity.y)
    
-    if i%1000 ==0:
+    if i%69 ==0:
         planet1.pointer.goto(planet1.position.x,planet1.position.y)
         planet2.pointer.goto(planet2.position.x, planet2.position.y)
         planet3.pointer.goto(planet3.position.x, planet3.position.y)
