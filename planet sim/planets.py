@@ -16,7 +16,7 @@ screen.setworldcoordinates(-5,-5,5,5)
 t_step = .001
 
 planet3 = util.Planet(1, util.Vector2(0, 0), util.Vector2(-0.93240737, -0.86473146), "green")
-planet1 = util.Planet(1, util.Vector2(0.97000436, -0.24308753), util.Vector2(-planet3.velocity.x/2, -planet3.velocity.y/2), "red")
+planet1 = util.Planet(1, util.Vector2(0.97000436, -0.24308753), util.Vector2(-planet3.velocity.x / 2, -planet3.velocity.y / 2), "red")
 planet2 = util.Planet(1, util.Vector2(-planet1.position.x, -planet1.position.y), planet1.velocity, "blue")
 
 i=0
