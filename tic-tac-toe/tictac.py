@@ -1,7 +1,8 @@
 import turtle
 import math
+from Tools.demo.ss1 import center
 
-def draw_rect(x1, y1, x2, y2, text, text_color ="white", color="#fc5203", border_color ="#03fc13", border_size = 10):
+def draw_rect(x1, y1, x2, y2, text, text_size, text_color ="white", color="#fc5203", border_color ="#03fc13", border_size = 100):
     pointer.fillcolor(color)
     pointer.color(border_color)
     pointer.pensize(border_size)
@@ -21,7 +22,7 @@ def draw_rect(x1, y1, x2, y2, text, text_color ="white", color="#fc5203", border
     
     pointer.color(text_color)
     pointer.goto((x1 + x2)/2, (y1 + y2)/2)
-    pointer.write(text, True, align="center", font=("Comic Sans", 10))
+    pointer.write(text, True, align="center", font=("Comic Sans", text_size, "bold"))
 
 def draw_line(x1, y1, x2, y2, color="#636E72", pensize=5):
     pointer.pensize(pensize)
@@ -46,7 +47,7 @@ def check_win():
         check_win_row([squares[0][0], squares[1][1], squares[2][2]]) or
         check_win_row([squares[0][2], squares[1][1], squares[2][0]])):
         
-        draw_rect(1, 1, 2, 2, "You win!")
+        draw_rect(1, 1.25, 2, 1.75, "YOU WIN!", 20)
         
 def box_clicker(x, y):
     global player1Turn
