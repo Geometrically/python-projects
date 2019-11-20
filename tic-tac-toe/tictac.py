@@ -1,16 +1,11 @@
 import turtle
 import math
-from Tools.demo.ss1 import center
 
-def draw_rect(x1, y1, x2, y2, text, text_size, text_color ="white", color="#fc5203", border_color ="#03fc13", border_size = 100):
-    pointer.fillcolor(color)
-    pointer.color(border_color)
-    pointer.pensize(border_size)
-    
+def draw_rect(x1, y1, x2, y2, text, textX, textY, text_size=20, text_color ="white", color="#0cf54a", border_color ="#09db41", border_size = 0.05):
+    pointer.fillcolor(border_color)
     pointer.begin_fill()
     
     pointer.goto(x1, y1)
-    pointer.down()
 
     pointer.goto(x2, y1)
     pointer.goto(x2, y2)
@@ -18,10 +13,21 @@ def draw_rect(x1, y1, x2, y2, text, text_size, text_color ="white", color="#fc52
     pointer.goto(x1, y1)
     
     pointer.end_fill()
-    pointer.up()
     
+    pointer.fillcolor(color)
+    pointer.begin_fill()
+    
+    pointer.goto(x1 + border_size, y1 + border_size)
+
+    pointer.goto(x2 - border_size, y1 + border_size)
+    pointer.goto(x2 - border_size, y2 - border_size)
+    pointer.goto(x1 + border_size, y2 - border_size)
+    pointer.goto(x1 + border_size, y1 + border_size)
+    
+    pointer.end_fill()
+
     pointer.color(text_color)
-    pointer.goto((x1 + x2)/2, (y1 + y2)/2)
+    pointer.goto(textX, textY)
     pointer.write(text, True, align="center", font=("Comic Sans", text_size, "bold"))
 
 def draw_line(x1, y1, x2, y2, color="#636E72", pensize=5):
@@ -34,7 +40,16 @@ def draw_line(x1, y1, x2, y2, color="#636E72", pensize=5):
     pointer.up()
 
 def check_win_row(win_rows):
-    return win_rows[0] != 0 and win_rows.count(win_rows[0]) == len(win_rows)
+    global winner
+    
+    if win_rows[0] != 0 and win_rows.count(win_rows[0]) == len(win_rows):
+        if win_rows[0] == 1:
+            winner = 1
+        else:
+            winner = 2
+        
+        return True
+    return False
 
 def check_win():
     global squares
@@ -47,11 +62,20 @@ def check_win():
         check_win_row([squares[0][0], squares[1][1], squares[2][2]]) or
         check_win_row([squares[0][2], squares[1][1], squares[2][0]])):
         
-        draw_rect(1, 1.25, 2, 1.75, "YOU WIN!", 20)
+        if(winner == 1):
+            draw_rect(0.8, 1, 2.2, 2, "X wins!", 1.5, 1.5)
+        elif winner == 2:
+            draw_rect(0.8, 1, 2.2, 2, "O wins!", 1.5, 1.5)
         
+        draw_rect(1.1, 1.7, 1.3, 1.8, "RESTART", 1.15, 1.55, 5, "white", "#09aedb", "#098edb")
+ 
 def box_clicker(x, y):
     global player1Turn
     global squares
+    global winner
+    
+    if winner != 0:
+        return
         
     if (x % 1 > 0.9 or x % 1 < 0.1) or (y % 1 > 0.9 or y % 1 < 0.1):
         return
@@ -91,7 +115,7 @@ def box_clicker(x, y):
 def clear():
     pointer.clearstamps()
 
-
+winner = 0
 player1Turn = True
 squares = [[0,0,0], [0,0,0], [0,0,0]]
 
