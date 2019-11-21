@@ -1,5 +1,6 @@
 import turtle
 import math
+from collections import namedtuple
 
 def draw_rect(x1, y1, x2, y2, text, textX, textY, text_size=20, text_color ="white", color="#0cf54a", border_color ="#09db41", border_size = 0.05):
     pointer.fillcolor(border_color)
@@ -53,6 +54,8 @@ def check_win_row(win_rows):
 
 def check_win():
     global squares
+    global current_buttons
+    global Button
     
     if ( 
         check_win_row(squares[0]) or check_win_row(squares[1]) or check_win_row(squares[2]) or
@@ -67,13 +70,20 @@ def check_win():
         elif winner == 2:
             draw_rect(0.8, 1, 2.2, 2, "O wins!", 1.5, 1.5)
         
-        draw_rect(1.1, 1.7, 1.3, 1.8, "RESTART", 1.15, 1.55, 5, "white", "#09aedb", "#098edb")
+        draw_rect(1.05, 1.25, 1.4, 1.4, "RESTART", 1.225, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
+        current_buttons.append(Button(1.05, 1.25, 1.4, 1.4, ))
+        
  
 def box_clicker(x, y):
     global player1Turn
     global squares
     global winner
+    global current_buttons
     
+    for button in current_buttons:
+        if button.x1 < x < button.x2 and button.y1 < y < button.y2:
+            button.on_click()
+        
     if winner != 0:
         return
         
@@ -112,12 +122,32 @@ def box_clicker(x, y):
 
     check_win()
     
-def clear():
-    pointer.clearstamps()
+def restart():
+    global squares
+    global player1Turn
+    global winner
+    
+    pointer.clear()
+    
+    pointer.pensize(5)
+
+    draw_line(1, 0, 1, 3)
+    draw_line(0, 2, 3, 2)
+    draw_line(2, 3, 2, 0)
+    draw_line(0, 1, 3, 1)
+    
+    squares = [[0,0,0], [0,0,0], [0,0,0]]
+    player1Turn = True
+    winner = 0
+
+
 
 winner = 0
 player1Turn = True
 squares = [[0,0,0], [0,0,0], [0,0,0]]
+
+Button = namedtuple("Button", "x1 x2 y1 y2 on_click")
+current_buttons = []
 
 screen = turtle.Screen()
 screen.screensize(700,700)
@@ -130,13 +160,7 @@ pointer.color("red")
 pointer.speed(0)
 pointer.pensize(5)
 
-draw_line(1, -1, 1, 3)
-draw_line(-1, 2, 3, 2)
-draw_line(2, 3, 2, -1)
-draw_line(-1, 1, 3, 1)
-
 screen.onclick(box_clicker)
-screen.onkey(clear, "c")
 
 screen.listen()
 
