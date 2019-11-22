@@ -70,11 +70,13 @@ def check_win():
         elif winner == 2:
             draw_rect(0.8, 1, 2.2, 2, "O wins!", 1.5, 1.5)
         
-        draw_rect(1.05, 1.25, 1.4, 1.4, "RESTART", 1.225, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
-        current_buttons.append(Button(1.05, 1.25, 1.4, 1.4, ))
+        draw_rect(1.1, 1.25, 1.45, 1.4, "RESTART", 1.275, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
+        current_buttons.append(Button(1.1, 1.25, 1.45, 1.4, restart))
+        draw_rect(1.5, 1.25, 1.85, 1.4, "MENU", 1.675, 1.3125, 5, "white", "#fc1303", "#db1c0f", 0.01)
+        current_buttons.append(Button(1.5, 1.25, 1.85, 1.4, draw_main_menu))
         
  
-def box_clicker(x, y):
+def on_click(x, y):
     global player1Turn
     global squares
     global winner
@@ -83,6 +85,8 @@ def box_clicker(x, y):
     for button in current_buttons:
         if button.x1 < x < button.x2 and button.y1 < y < button.y2:
             button.on_click()
+            current_buttons.remove(button)
+            return
         
     if winner != 0:
         return
@@ -121,11 +125,17 @@ def box_clicker(x, y):
         squares[squareX][squareY] = 2
 
     check_win()
+
+
+def draw_main_menu():
+    pointer.clear()
+    
+    pointer.goto(2.5, 1.5)
+    pointer.stamp("logo.png")
+
     
 def restart():
-    global squares
-    global player1Turn
-    global winner
+    global squares, winner, player1Turn
     
     pointer.clear()
     
@@ -140,18 +150,17 @@ def restart():
     player1Turn = True
     winner = 0
 
-
-
 winner = 0
 player1Turn = True
 squares = [[0,0,0], [0,0,0], [0,0,0]]
 
-Button = namedtuple("Button", "x1 x2 y1 y2 on_click")
+Button = namedtuple("Button", "x1 y1 x2 y2 on_click")
 current_buttons = []
 
 screen = turtle.Screen()
 screen.screensize(700,700)
 screen.setworldcoordinates(0, 0, 3, 3)
+screen.register_shape("logo.png")
 
 pointer = turtle.Turtle()
 pointer.hideturtle()
@@ -160,7 +169,8 @@ pointer.color("red")
 pointer.speed(0)
 pointer.pensize(5)
 
-screen.onclick(box_clicker)
+screen.onclick(on_click)
+draw_main_menu()
 
 screen.listen()
 
