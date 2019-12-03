@@ -31,6 +31,10 @@ def draw_rect(x1, y1, x2, y2, text, textX, textY, text_size=20, text_color ="whi
     pointer.goto(textX, textY)
     pointer.write(text, True, align="center", font=("Comic Sans", text_size, "bold"))
 
+def draw_button(button_callback, x1, y1, x2, y2, text, textX, textY, text_size=20, text_color ="white", color="#0cf54a", border_color ="#09db41", border_size = 0.05):
+    draw_rect(x1, y1, x2, y2, text, textX, textY, text_size, text_color, color, border_color, border_size)
+    current_buttons.append(Button(x1, y1, x2, y2, button_callback))
+    
 def draw_line(x1, y1, x2, y2, color="#636E72", pensize=5):
     pointer.pensize(pensize)
     pointer.color(color)
@@ -70,10 +74,8 @@ def check_win():
         elif winner == 2:
             draw_rect(0.8, 1, 2.2, 2, "O wins!", 1.5, 1.5)
         
-        draw_rect(1.1, 1.25, 1.45, 1.4, "RESTART", 1.275, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
-        current_buttons.append(Button(1.1, 1.25, 1.45, 1.4, restart))
-        draw_rect(1.5, 1.25, 1.85, 1.4, "MENU", 1.675, 1.3125, 5, "white", "#fc1303", "#db1c0f", 0.01)
-        current_buttons.append(Button(1.5, 1.25, 1.85, 1.4, draw_main_menu))
+        draw_button(restart, 1.1, 1.25, 1.45, 1.4, "RESTART", 1.275, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
+        draw_button(draw_main_menu, 1.5, 1.25, 1.85, 1.4, "MENU", 1.675, 1.3125, 5, "white", "#fc1303", "#db1c0f", 0.01)
         
  
 def on_click(x, y):
@@ -118,7 +120,7 @@ def on_click(x, y):
         pointer.stamp()
         
         pointer.shapesize(5)
-        pointer.color("white")
+        pointer.color("#ffffff")
         pointer.stamp()
                 
         player1Turn = True
@@ -129,11 +131,10 @@ def on_click(x, y):
 
 def draw_main_menu():
     pointer.clear()
-    
-    pointer.goto(2.5, 1.5)
-    pointer.stamp("logo.png")
+        
+    draw_button(restart, 1.1, 1.95, 1.9, 2.25, "START", 1.5, 2.04, 15, "white", "#09aedb", "#098edb", 0.05)
+    # draw_button(pass, 1.1, 1.95, 1.9, 2.25, "RESTART", 1.5, 2.1, 15, "white", "#09aedb", "#098edb", 0.05)
 
-    
 def restart():
     global squares, winner, player1Turn
     
@@ -160,7 +161,6 @@ current_buttons = []
 screen = turtle.Screen()
 screen.screensize(700,700)
 screen.setworldcoordinates(0, 0, 3, 3)
-screen.register_shape("logo.png")
 
 pointer = turtle.Turtle()
 pointer.hideturtle()
