@@ -71,33 +71,66 @@ def draw_line(pointer, x1, y1, x2, y2, color="#636E72", pensize=5):
     pointer.goto(x2, y2)
     pointer.up()
     
-def draw_inv(pointer, actions):
+def draw_inv(pointer, items):
     pointer.clear()
     draw_text(pointer, "↓ INVENTORY", 2.75, 2.45, 10, "black")
     
-    for index, action in enumerate(actions):
-        draw_rect_text(pointer, 2.5, 2.2 - index*0.25, 2.9, 2.4 - index*0.25,"TEST", 2.7, 2.26 - index*0.25, 10, "white", "#e38412", "#a16216", 0.02)
+    for index, item in enumerate(items):
+        draw_rect_text(pointer, 2.5, 2.2 - index*0.25, 2.9, 2.4 - index*0.25, item, 2.7, 2.26 - index*0.25, 10, "white", "#e38412", "#a16216", 0.02)
         
 def draw_actions(pointer, actions):
     pointer.clear()
     draw_text(pointer, "ACTIONS ↓", 0.15, 2.45, 10, "black")
     
     for index, action in enumerate(actions):
-        draw_rect_text(pointer, 0.1, 2.2 - index*0.25, 0.5, 2.4 - index*0.25, action, 0.3, 2.26 - index*0.25, 10, "white", "#e38412", "#a16216", 0.02)
+        draw_rect_text(pointer, 0.05, 2.2 - index*0.25, 0.55, 2.4 - index*0.25, action, 0.3, 2.26 - index*0.25, 10, "white", "#e38412", "#a16216", 0.02)
 
-def draw_floor(floor):
-    pass
-
+def init_floor(board_pointer, inv_pointer, actions_pointer, floor, floors):
+    available_actions = []
+    
+    for other_floor in floors:
+        if other_floor.x - floor.x == 1 and other_floor.y == floor.y:
+            available_actions.append("LEFT")
+            break
+        elif other_floor.x - floor.x == -1 and other_floor.y == floor.y:
+            available_actions.append("RIGHT")
+            break
+        
+    if floor.magic_stone:
+        board_pointer.shape("turtle")
+        board_pointer.goto(0.9, 0.7)
+        board_pointer.stamp()
+        
+        available_actions.append("GRAB STONE")
+    if floor.down_staircase:
+        board_pointer.shape("turtle")
+        board_pointer.goto(1.0, 2.2)
+        board_pointer.stamp()
+        
+        available_actions.append("DOWN")
+    if floor.up_staircase:
+        board_pointer.shape("turtle")
+        board_pointer.goto(2.0, 2.2)
+        board_pointer.stamp()
+        
+        available_actions.append("UP")
+    if floor.item != "none":
+        draw_text(board_pointer, floor.item, 1.5, 0.7, 10, "black")
+        
+        available_actions.append("GRAB " + floor.item)
+        
+    draw_actions(actions_pointer, available_actions)
 Button = namedtuple("Button", "x1 y1 x2 y2 on_click")
 current_buttons = []
 
-Floor = namedtuple("Floor", "x y down_staircase up_staircase magic_stone item")
+Floor = namedtuple("Floor", "x y down_staircase up_staircase magic_stone item has_boss")
+floors = [Floor(1, 1, False, True, False, "sdesd", False), Floor(0, 1, False, True, False, "sdesd", False)]
 
 screen = turtle.Screen()
 screen.screensize(700,700)
 screen.setworldcoordinates(0, 0, 3, 3)
 
-screen.register_shape('zelda.gif')
+# screen.register_shape('zelda.gif')
 
 fixed_pointer = turtle.Turtle()
 fixed_pointer.hideturtle()
@@ -117,6 +150,12 @@ inv_pointer.up()
 inv_pointer.speed(0)
 inv_pointer.pensize(5)
 
+board_pointer = turtle.Turtle()
+board_pointer.hideturtle()
+board_pointer.up()
+board_pointer.speed(0)
+board_pointer.pensize(5)
+
 screen.listen()
 
 draw_text(fixed_pointer, "ZORC by Jai", 1.5, 2.6, 30, "black")
@@ -128,10 +167,12 @@ draw_rect_text(fixed_pointer, 1.55, 0.25, 2.4, 0.45, "EXIT", 1.975, 0.3, 10, "wh
 draw_actions(actions_pointer, ["Ts", "tets"])
 draw_inv(inv_pointer, ["sword", "apple"])
 
-player = turtle.Turtle()
-player.shape("zelda.gif")
-player.up()
-player.shapesize(1)
-player.goto(1.5, 1.5)
+init_floor(board_pointer, inv_pointer, actions_pointer, floors[0], floors)
+
+# player = turtle.Turtle()
+# player.shape("zelda.gif")
+# player.up()
+# player.shapesize(1)
+# player.goto(1.5, 1.5)
 
 screen.mainloop()
