@@ -60,7 +60,7 @@ def draw_line(pointer, x1, y1, x2, y2, color="#636E72", pensize=5):
 
 def draw_inv():
     inv_pointer.clear()
-    draw_text(inv_pointer, "↓ INVENTORY", 2.75, 2.45, 10, "black")
+    draw_text(inv_pointer, "â†“ INVENTORY", 2.75, 2.45, 10, "black")
 
     for index, item in enumerate(items):
         draw_rect_text(inv_pointer, 2.5, 2.2 - index * 0.25, 2.9, 2.4 - index * 0.25, item, 2.7, 2.3 - index * 0.25, 10,
@@ -69,25 +69,29 @@ def draw_inv():
 
 def draw_actions(actions):
     actions_pointer.clear()
-    draw_text(actions_pointer, "ACTIONS ↓", 0.15, 2.45, 10, "black")
+    draw_text(actions_pointer, "ACTIONS â†“", 0.15, 2.45, 10, "black")
 
     for index, action in enumerate(actions):
         draw_button(action.on_click, actions_pointer, 0.05, 2.2 - index * 0.25, 0.55, 2.4 - index * 0.25, action.name,
                     0.3, 2.3 - index * 0.25, 10, "white", "#e38412", "#a16216", 0.02)
 
 
-def get_floor(x, y):
-    horizontal_floors = []
-
+def draw_lore_text(text):
+    text_pointer.clear()
+    
+    if(len(text) > 46):
+        draw_text(text_pointer, text[:46] + "-", 1.5, 0.35, 10, "white")
+        draw_text(text_pointer, text[46:], 1.5, 0.3, 10, "white")
+    else:
+        draw_text(text_pointer, text, 1.5, 0.3, 10, "white")
+    
+    
+def get_floor(x, y, z):
     for floor in floors:
-        if floor.x == x:
-            horizontal_floors.append(floor)
-
-    for horizontal_floor in horizontal_floors:
-        if horizontal_floor.y == y:
-            return horizontal_floor
-
-    return Floor(x, y, False, False, False, "none", False)
+        if floor.x == x and floor.y == y and floor.z == z:
+            return floor
+    
+    return Floor(x, y, z, False, False, False, "none", False)
 
 
 def update_floor(floor, new_floor):
@@ -102,28 +106,34 @@ def init_floor(floor):
 
     available_actions = []
 
-    draw_rect(transition_pointer, 0.65, 0.55, 2.35, 2.45, "#676269", "#ffffff", 0)
-    time.sleep(.400)
-    draw_rect(transition_pointer, 0.65, 0.55, 2.35, 2.45, "#514f52", "#ffffff", 0)
-    time.sleep(.400)
-    draw_rect(transition_pointer, 0.65, 0.55, 2.35, 2.45, "#000000", "#ffffff", 0)
-
     board_pointer.clear()
+    
+    draw_lore_text(floor.enter_text)
+    
     player.goto(1.5, 1.5)
 
     for other_floor in floors:
-        if other_floor.x - floor.x == 1 and other_floor.y == floor.y:
+        if other_floor.x - floor.x == 1 and other_floor.y == floor.y and other_floor.z == floor.z:
             available_actions.append(Action("RIGHT", lambda: (
                 player.goto(2.3, 1.5),
-                init_floor(get_floor(floor.x + 1, floor.y))
+                init_floor(get_floor(floor.x + 1, floor.y, floor.z))
             )))
-            break
-        elif other_floor.x - floor.x == -1 and other_floor.y == floor.y:
+        elif other_floor.x - floor.x == -1 and other_floor.y == floor.y and other_floor.z == floor.z:
             available_actions.append(Action("LEFT", lambda: (
                 player.goto(0.7, 1.5),
-                init_floor(get_floor(floor.x - 1, floor.y))
+                init_floor(get_floor(floor.x - 1, floor.y, floor.z))
             )))
-            break
+        
+        if other_floor.z - floor.z == 1 and other_floor.y == floor.y and other_floor.x == floor.x:
+            available_actions.append(Action("FORWARD", lambda: (
+                player.goto(1.5, 2.0),
+                init_floor(get_floor(floor.x + 1, floor.y, floor.z))
+            )))
+        elif other_floor.z - floor.z == -1 and other_floor.y == floor.y and other_floor.x == floor.x:
+            available_actions.append(Action("BACKWARD", lambda: (
+                player.goto(1.5, 0.7),
+                init_floor(get_floor(floor.x - 1, floor.y, floor.z))
+            )))        
 
     if floor.magic_stone:
         board_pointer.shape("stone.gif")
@@ -134,7 +144,7 @@ def init_floor(floor):
             items.append("Magic Stone"),
             draw_inv(),
             player.goto(0.9, 0.7),
-            update_floor(floor, Floor(floor.x, floor.y, floor.down_staircase, floor.up_staircase, False, floor.item, floor.has_boss))
+            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, False, floor.item, floor.has_boss, floor.enter_text))
         )))
     if floor.down_staircase:
         board_pointer.shape("manhole.gif")
@@ -143,7 +153,7 @@ def init_floor(floor):
 
         available_actions.append(Action("DOWN", lambda: (
             player.goto(1.0, 2.2),
-            init_floor(get_floor(floor.x, floor.y - 1))
+            init_floor(get_floor(floor.x, floor.y - 1, floor.z))
         )))
     if floor.up_staircase:
         board_pointer.shapesize(1, 1)
@@ -153,7 +163,7 @@ def init_floor(floor):
 
         available_actions.append(Action("UP", lambda: (
             player.goto(2.0, 2.1),
-            init_floor(get_floor(floor.x, floor.y + 1))
+            init_floor(get_floor(floor.x, floor.y + 1, floor.z))
         )))
     if floor.item != "none":
         draw_text(board_pointer, floor.item, 1.5, 0.7, 10, "black")
@@ -162,20 +172,11 @@ def init_floor(floor):
             items.append(floor.item),
             draw_inv(),
             player.goto(1.5, 0.7),
-            update_floor(floor, Floor(floor.x, floor.y, floor.down_staircase, floor.up_staircase, floor.magic_stone, "none", floor.has_boss))
+            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, "none", floor.has_boss, floor.enter_text))
         )))
 
 
     draw_actions(available_actions)
-
-    draw_rect(transition_pointer, 0.65, 0.55, 2.35, 2.45, "#514f52", "#ffffff", 0)
-    time.sleep(.400)
-    draw_rect(transition_pointer, 0.65, 0.55, 2.35, 2.45, "#676269", "#ffffff", 0)
-    time.sleep(.400)
-    draw_rect(transition_pointer, 0.65, 0.55, 2.35, 2.45, "#000000", "#ffffff", 0)
-    transition_pointer.clear()
-
-
 
 def on_click(x, y):
     global current_buttons
@@ -192,8 +193,12 @@ Action = namedtuple("Action", "name on_click")
 Button = namedtuple("Button", "x1 y1 x2 y2 on_click")
 current_buttons = []
 
-Floor = namedtuple("Floor", "x y down_staircase up_staircase magic_stone item has_boss")
-floors = [Floor(1, 1, True, True, False, "sdesd", False), Floor(0, 1, False, True, False, "sdesd", False)]
+Floor = namedtuple("Floor", "x y z down_staircase up_staircase magic_stone item has_boss enter_text")
+floors = [
+    Floor(1, 1, 1, True, True, False, "sdesd", False, "Welcome to zorc! The king has sent you to retrieve the magic stone! Good Luck!"), 
+    Floor(1, 1, 0, True, True, False, "sdesd", False, "a"), 
+    Floor(0, 1, 1, False, True, False, "sdesd", False, "a")
+]
 
 items = []
 
@@ -231,17 +236,19 @@ board_pointer.up()
 board_pointer.speed(0)
 board_pointer.pensize(5)
 
-transition_pointer = turtle.Turtle()
-transition_pointer.hideturtle()
-transition_pointer.up()
-transition_pointer.speed(0)
-transition_pointer.pensize(5)
+text_pointer = turtle.Turtle()
+text_pointer.hideturtle()
+text_pointer.up()
+text_pointer.speed(0)
+text_pointer.pensize(5)
 
 draw_text(fixed_pointer, "ZORC by Jai", 1.5, 2.6, 30, "black")
 draw_rect(fixed_pointer, 0.6, 0.5, 2.4, 2.5, "white", "#6e410a", 0.05)
 
-draw_rect_text(fixed_pointer, 0.6, 0.25, 1.45, 0.45, "HELP", 1.025, 0.32, 10, "white", "#4287f5", "#2253a1", 0.05)
-draw_rect_text(fixed_pointer, 1.55, 0.25, 2.4, 0.45, "EXIT", 1.975, 0.32, 10, "white", "#f71121", "#d11320", 0.05)
+draw_rect(fixed_pointer, 0.6, 0.27, 2.4, 0.48, "#a35718", "#733f14", 0.02)
+
+draw_rect_text(fixed_pointer, 0.6, 0.05, 1.45, 0.25, "HELP", 1.025, 0.14, 10, "white", "#4287f5", "#2253a1", 0.05)
+draw_rect_text(fixed_pointer, 1.55, 0.05, 2.4, 0.25, "EXIT", 1.975, 0.14, 10, "white", "#f71121", "#d11320", 0.05)
 
 player = turtle.Turtle()
 player.shape("link.gif")
