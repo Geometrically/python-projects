@@ -1,5 +1,4 @@
 import turtle
-import time
 from collections import namedtuple
 
 
@@ -79,7 +78,7 @@ def draw_actions(actions):
 def draw_lore_text(text):
     text_pointer.clear()
     
-    if(len(text) > 46):
+    if len(text) > 46:
         draw_text(text_pointer, text[:46] + "-", 1.5, 0.35, 10, "white")
         draw_text(text_pointer, text[46:], 1.5, 0.3, 10, "white")
     else:
