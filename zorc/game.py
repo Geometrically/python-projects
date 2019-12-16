@@ -1,4 +1,5 @@
 import turtle
+import time
 from collections import namedtuple
 
 
@@ -78,7 +79,7 @@ def draw_actions(actions):
 def draw_lore_text(text):
     text_pointer.clear()
     
-    if len(text) > 46:
+    if(len(text) > 46):
         draw_text(text_pointer, text[:46] + "-", 1.5, 0.35, 10, "white")
         draw_text(text_pointer, text[46:], 1.5, 0.3, 10, "white")
     else:
@@ -90,18 +91,21 @@ def get_floor(x, y, z):
         if floor.x == x and floor.y == y and floor.z == z:
             return floor
     
-    return Floor(x, y, z, False, False, False, "none", False)
+    return Floor(x, y, z, False, False, False, "none", False, "None", False)
 
 
 def update_floor(floor, new_floor):
     global floors
 
     floors[floors.index(floor)] = new_floor
+    init_floor(new_floor)
 
 
 def init_floor(floor):
     global items
     global floors
+    
+    current_buttons.clear()
 
     available_actions = []
 
@@ -126,12 +130,12 @@ def init_floor(floor):
         if other_floor.z - floor.z == 1 and other_floor.y == floor.y and other_floor.x == floor.x:
             available_actions.append(Action("FORWARD", lambda: (
                 player.goto(1.5, 2.0),
-                init_floor(get_floor(floor.x + 1, floor.y, floor.z))
+                init_floor(get_floor(floor.x, floor.y, floor.z + 1))
             )))
         elif other_floor.z - floor.z == -1 and other_floor.y == floor.y and other_floor.x == floor.x:
             available_actions.append(Action("BACKWARD", lambda: (
                 player.goto(1.5, 0.7),
-                init_floor(get_floor(floor.x - 1, floor.y, floor.z))
+                init_floor(get_floor(floor.x, floor.y, floor.z - 1))
             )))        
 
     if floor.magic_stone:
@@ -143,7 +147,7 @@ def init_floor(floor):
             items.append("Magic Stone"),
             draw_inv(),
             player.goto(0.9, 0.7),
-            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, False, floor.item, floor.has_boss, floor.enter_text))
+            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, False, floor.item, floor.has_boss, floor.enter_text, False))
         )))
     if floor.down_staircase:
         board_pointer.shape("manhole.gif")
@@ -171,10 +175,23 @@ def init_floor(floor):
             items.append(floor.item),
             draw_inv(),
             player.goto(1.5, 0.7),
-            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, "none", floor.has_boss, floor.enter_text))
+            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, "none", floor.has_boss, floor.enter_text, False))
         )))
-
-
+    if floor.monster:
+        board_pointer.shape("monster.gif")
+        board_pointer.goto(1.0, 1.5)
+        board_pointer.stamp()
+        
+        player.goto(2.0, 1.5)
+        
+        if "sword" in items:
+            available_actions.append(Action("KILL MONSTER", lambda: (
+                items.remove("sword"),
+                draw_inv(),
+                player.goto(1.5, 1.5),
+                update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, floor.item, floor.has_boss, floor.enter_text, False))
+            )))
+        
     draw_actions(available_actions)
 
 def on_click(x, y):
@@ -192,11 +209,16 @@ Action = namedtuple("Action", "name on_click")
 Button = namedtuple("Button", "x1 y1 x2 y2 on_click")
 current_buttons = []
 
-Floor = namedtuple("Floor", "x y z down_staircase up_staircase magic_stone item has_boss enter_text")
+Floor = namedtuple("Floor", "x y z down_staircase up_staircase magic_stone item has_boss enter_text monster")
 floors = [
-    Floor(1, 1, 1, True, True, False, "sdesd", False, "Welcome to zorc! The king has sent you to retrieve the magic stone! Good Luck!"), 
-    Floor(1, 1, 0, True, True, False, "sdesd", False, "a"), 
-    Floor(0, 1, 1, False, True, False, "sdesd", False, "a")
+    Floor(1, 1, 1, False, False, False, "none", False, "Welcome to zorc! The king has sent you to retrieve the magic stone! Good Luck!", False), 
+    Floor(0, 1, 2, False, False, False, "none", False, "What a useless room... Must be a dead end", False), 
+    Floor(1, 1, 2, False, False, False, "none", False, "Left or right, what a dillema", False), 
+    Floor(2, 1, 2, False, False, False, "sword", False, "That sword is shiny! It might be useful in the future for fighting.", False), 
+    Floor(2, 1, 1, False, False, False, "none", False, "Oh no! A monster?? What will I do?", True), 
+    Floor(3, 1, 2, False, True, False, "none", False, "A new level! This will get me closer to escaping", False),
+    Floor(3, 2, 2, False, True, False, "none", False, "Very spooky... I hope I don't die", False),
+    Floor(3, 2, 2, False, True, False, "none", False, "Very spooky... I hope I don't die", False)
 ]
 
 items = []
@@ -241,7 +263,7 @@ text_pointer.up()
 text_pointer.speed(0)
 text_pointer.pensize(5)
 
-draw_text(fixed_pointer, "ZORC by Jai", 1.5, 2.6, 30, "black")
+draw_text(fixed_pointer, "ZORK by Jai", 1.5, 2.6, 30, "black")
 draw_rect(fixed_pointer, 0.6, 0.5, 2.4, 2.5, "white", "#6e410a", 0.05)
 
 draw_rect(fixed_pointer, 0.6, 0.27, 2.4, 0.48, "#a35718", "#733f14", 0.02)
