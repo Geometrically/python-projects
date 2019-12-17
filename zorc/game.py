@@ -100,7 +100,38 @@ def update_floor(floor, new_floor):
     floors[floors.index(floor)] = new_floor
     init_floor(new_floor)
 
+def win():
+    draw_rect_text(board_pointer, 0.8, 1, 2.2, 2, "You won!", 1.5, 1.5)
 
+    draw_button(restart, board_pointer, 1.1, 1.25, 1.45, 1.4, "RESTART", 1.275, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
+    draw_button(exit, board_pointer, 1.5, 1.25, 1.85, 1.4, "EXIT", 1.675, 1.3125, 5, "white", "#fc1303", "#db1c0f", 0.01)
+
+def die():
+    draw_rect_text(board_pointer, 0.8, 1, 2.2, 2, "You died!", 1.5, 1.5)
+
+    draw_button(restart, board_pointer, 1.1, 1.25, 1.45, 1.4, "RESTART", 1.275, 1.3125, 5, "white", "#09aedb", "#098edb", 0.01)
+    draw_button(exit, board_pointer, 1.5, 1.25, 1.85, 1.4, "EXIT", 1.675, 1.3125, 5, "white", "#fc1303", "#db1c0f", 0.01)
+
+def restart():
+    global floors
+    
+    floors = [
+        Floor(1, 1, 1, False, False, False, "none", False, "Welcome to zorc! The king has sent you to retrieve the magic stone! Good Luck!", False), 
+        Floor(0, 1, 2, False, False, False, "none", False, "What a useless room... Must be a dead end", False), 
+        Floor(1, 1, 2, False, False, False, "none", False, "Left or right, what a dillema", False), 
+        Floor(2, 1, 2, False, False, False, "sword", False, "That sword is shiny! It might be useful in the future for fighting.", False), 
+        Floor(2, 1, 1, False, False, False, "none", False, "Oh no! A monster?? What will I do?", True), 
+        Floor(3, 1, 2, False, True, False, "none", False, "A new level! This will get me closer to escaping", False),
+        Floor(3, 2, 2, True, False, False, "none", False, "Very spooky... I hope I don't die", False),
+        Floor(2, 2, 2, False, False, False, "sword", False, "Another sword, nice!", False),
+        Floor(1, 2, 1, True, False, False, "none", False, "It looks like a one way hole.. No point of going down", False),
+        Floor(1, 2, 2, False, False, False, "none", False, "A split choice, backward or forward, what will it be?", False),
+        Floor(1, 2, 3, False, False, False, "none", False, "Oh no, a monster!", True),
+        Floor(0, 3, 3, True, False, False, "none", False, "The next floor, I'm almost out of this place!", False)
+    ]
+    
+    init_floor(floors[0])
+    
 def init_floor(floor):
     global items
     global floors
@@ -175,7 +206,7 @@ def init_floor(floor):
             items.append(floor.item),
             draw_inv(),
             player.goto(1.5, 0.7),
-            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, "none", floor.has_boss, floor.enter_text, False))
+            update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, "none", floor.has_boss, "I've already been here...", False))
         )))
     if floor.monster:
         board_pointer.shape("monster.gif")
@@ -189,8 +220,22 @@ def init_floor(floor):
                 items.remove("sword"),
                 draw_inv(),
                 player.goto(1.5, 1.5),
-                update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, floor.item, floor.has_boss, floor.enter_text, False))
+                update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, floor.item, floor.has_boss, "I've already been here", False))
             )))
+        else:
+           available_actions.append(Action("KILL MONSTER", die))
+           
+    if floor.has_boss:
+        board_pointer.shape("boss.gif")
+        board_pointer.goto(1.0, 1.5)
+        board_pointer.stamp()
+        
+        player.goto(2.0, 1.5)
+        
+        if "sword" in items and "magic_stone" in items and random.randint(0,100) <= 40:
+            available_actions.append(Action("KILL MONSTER", win))
+        else:
+           available_actions.append(Action("KILL MONSTER", die))
         
     draw_actions(available_actions)
 
@@ -217,8 +262,13 @@ floors = [
     Floor(2, 1, 2, False, False, False, "sword", False, "That sword is shiny! It might be useful in the future for fighting.", False), 
     Floor(2, 1, 1, False, False, False, "none", False, "Oh no! A monster?? What will I do?", True), 
     Floor(3, 1, 2, False, True, False, "none", False, "A new level! This will get me closer to escaping", False),
-    Floor(3, 2, 2, False, True, False, "none", False, "Very spooky... I hope I don't die", False),
-    Floor(3, 2, 2, False, True, False, "none", False, "Very spooky... I hope I don't die", False)
+    Floor(3, 2, 2, True, False, False, "none", False, "Very spooky... I hope I don't die", False),
+    Floor(2, 2, 2, False, False, False, "sword", False, "Another sword, nice!", False),
+    Floor(1, 2, 1, True, False, False, "none", False, "It looks like a one way hole.. No point of going down", False),
+    Floor(1, 2, 2, False, False, False, "none", False, "A split choice, backward or forward, what will it be?", False),
+    Floor(1, 2, 3, False, False, False, "none", False, "Oh no, a monster!", True),
+    Floor(0, 2, 3, False, True, False, "none", False, "Yes! The next floor, I'm almost out of this place!", False),
+    Floor(0, 3, 3, True, False, False, "none", False, "Something smells like trees here..", False)
 ]
 
 items = []
@@ -232,6 +282,7 @@ screen.register_shape('ladder.gif')
 screen.register_shape('manhole.gif')
 screen.register_shape('monster.gif')
 screen.register_shape('stone.gif')
+screen.register_shape('boss.gif')
 
 fixed_pointer = turtle.Turtle()
 fixed_pointer.hideturtle()
