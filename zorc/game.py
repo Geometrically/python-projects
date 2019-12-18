@@ -1,5 +1,5 @@
 import turtle
-import time
+import random
 from collections import namedtuple
 
 
@@ -114,6 +114,7 @@ def die():
 
 def restart():
     global floors
+    global items
     
     floors = [
         Floor(1, 1, 1, False, False, False, "none", False, "Welcome to zorc! The king has sent you to retrieve the magic stone! Good Luck!", False), 
@@ -127,8 +128,20 @@ def restart():
         Floor(1, 2, 1, True, False, False, "none", False, "It looks like a one way hole.. No point of going down", False),
         Floor(1, 2, 2, False, False, False, "none", False, "A split choice, backward or forward, what will it be?", False),
         Floor(1, 2, 3, False, False, False, "none", False, "Oh no, a monster!", True),
-        Floor(0, 3, 3, True, False, False, "none", False, "The next floor, I'm almost out of this place!", False)
+        Floor(0, 2, 3, False, True, False, "none", False, "Yes! The next floor, I'm almost out of this place!", False),
+        Floor(0, 3, 3, True, False, False, "none", False, "Something smells like trees here..", False),
+        Floor(1, 3, 3, False, False, True, "none", False, "This stone might be useful in the future", False),
+        Floor(1, 3, 2, False, False, False, "sword", False, "Yes, another sword!", False),
+        Floor(2, 3, 2, False, False, False, "none", False, "Oh no, not another monster..", True),
+        Floor(2, 3, 1, False, False, False, "potion", False, "I've never seen this potion before, it might be useful in the future!", False),
+        Floor(3, 3, 2, False, False, False, "sword", False, "So many swords... I hope I don't have to use it soon", False),
+        Floor(3, 3, 3, False, False, False, "none", True, "The boss! Once I beat this I can escape!", False)
     ]
+    
+    items = []
+    
+    draw_inv(items)
+
     
     init_floor(floors[0])
     
@@ -213,6 +226,10 @@ def init_floor(floor):
         board_pointer.goto(1.0, 1.5)
         board_pointer.stamp()
         
+        old_action = available_actions[0]
+        available_actions.clear()
+        available_actions.append(Action("RUN", old_action.on_click))
+        
         player.goto(2.0, 1.5)
         
         if "sword" in items:
@@ -223,7 +240,7 @@ def init_floor(floor):
                 update_floor(floor, Floor(floor.x, floor.y, floor.z, floor.down_staircase, floor.up_staircase, floor.magic_stone, floor.item, floor.has_boss, "I've already been here", False))
             )))
         else:
-           available_actions.append(Action("KILL MONSTER", die))
+            available_actions.append(Action("KILL MONSTER", die))
            
     if floor.has_boss:
         board_pointer.shape("boss.gif")
@@ -232,10 +249,10 @@ def init_floor(floor):
         
         player.goto(2.0, 1.5)
         
-        if "sword" in items and "magic_stone" in items and random.randint(0,100) <= 40:
-            available_actions.append(Action("KILL MONSTER", win))
+        if "sword" in items and "magic_stone" in items and "potion" in items and random.randint(0,100) <= 40:
+            available_actions.append(Action("KILL BOSS", win))
         else:
-           available_actions.append(Action("KILL MONSTER", die))
+            available_actions.append(Action("KILL BOSS", die))
         
     draw_actions(available_actions)
 
@@ -259,8 +276,8 @@ floors = [
     Floor(1, 1, 1, False, False, False, "none", False, "Welcome to zorc! The king has sent you to retrieve the magic stone! Good Luck!", False), 
     Floor(0, 1, 2, False, False, False, "none", False, "What a useless room... Must be a dead end", False), 
     Floor(1, 1, 2, False, False, False, "none", False, "Left or right, what a dillema", False), 
-    Floor(2, 1, 2, False, False, False, "sword", False, "That sword is shiny! It might be useful in the future for fighting.", False), 
-    Floor(2, 1, 1, False, False, False, "none", False, "Oh no! A monster?? What will I do?", True), 
+    Floor(2, 1, 1, False, False, False, "sword", False, "That sword is shiny! It might be useful in the future for fighting.", False), 
+    Floor(2, 1, 2, False, False, False, "none", False, "Oh no! A monster?? What will I do?", True), 
     Floor(3, 1, 2, False, True, False, "none", False, "A new level! This will get me closer to escaping", False),
     Floor(3, 2, 2, True, False, False, "none", False, "Very spooky... I hope I don't die", False),
     Floor(2, 2, 2, False, False, False, "sword", False, "Another sword, nice!", False),
@@ -268,7 +285,13 @@ floors = [
     Floor(1, 2, 2, False, False, False, "none", False, "A split choice, backward or forward, what will it be?", False),
     Floor(1, 2, 3, False, False, False, "none", False, "Oh no, a monster!", True),
     Floor(0, 2, 3, False, True, False, "none", False, "Yes! The next floor, I'm almost out of this place!", False),
-    Floor(0, 3, 3, True, False, False, "none", False, "Something smells like trees here..", False)
+    Floor(0, 3, 3, True, False, False, "none", False, "Something smells like trees here..", False),
+    Floor(1, 3, 3, False, False, True, "none", False, "This stone might be useful in the future", False),
+    Floor(1, 3, 2, False, False, False, "sword", False, "Yes, another sword!", False),
+    Floor(2, 3, 2, False, False, False, "none", False, "Oh no, not another monster..", True),
+    Floor(2, 3, 1, False, False, False, "potion", False, "I've never seen this potion before, it might be useful in the future!", False),
+    Floor(3, 3, 2, False, False, False, "sword", False, "So many swords... I hope I don't have to use it soon", False),
+    Floor(3, 3, 3, False, False, False, "none", True, "The boss! Once I beat this I can escape!", False)
 ]
 
 items = []
@@ -319,8 +342,7 @@ draw_rect(fixed_pointer, 0.6, 0.5, 2.4, 2.5, "white", "#6e410a", 0.05)
 
 draw_rect(fixed_pointer, 0.6, 0.27, 2.4, 0.48, "#a35718", "#733f14", 0.02)
 
-draw_rect_text(fixed_pointer, 0.6, 0.05, 1.45, 0.25, "HELP", 1.025, 0.14, 10, "white", "#4287f5", "#2253a1", 0.05)
-draw_rect_text(fixed_pointer, 1.55, 0.05, 2.4, 0.25, "EXIT", 1.975, 0.14, 10, "white", "#f71121", "#d11320", 0.05)
+draw_button(exit, fixed_pointer, 0.6, 0.05, 2.4, 0.25, "EXIT", 1.5, 0.14, 10, "white", "#f71121", "#d11320", 0.05)
 
 player = turtle.Turtle()
 player.shape("link.gif")
