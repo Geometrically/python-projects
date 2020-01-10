@@ -1,7 +1,8 @@
 import time
 import random
 import bisect
- 
+import sys
+
 random.seed()
 
  
@@ -231,7 +232,16 @@ def bin_index(vals, searchVal):
         raise ValueError
        
 # MY CODE BELOW
-
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+    
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    
+    for i in range(100):
+        print()
+        
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
 
 def binary_search(val, vals):
     done = False
@@ -239,14 +249,14 @@ def binary_search(val, vals):
     current_vals = vals
     
     while not done:
-        half = len(vals) // 2 if len(vals) > 1 else 0
-    
-        if vals[half] < val:
-            current_vals = current_vals[current_vals:]
-        elif vals[half] > val:
-            current_vals = current_vals[:current_vals]
+        half = len(current_vals) // 2 if len(current_vals) > 1 else 0
+        
+        if current_vals[half] < val:
+            current_vals = current_vals[half:]
+        elif current_vals[half] > val:
+            current_vals = current_vals[:half]
         else:
-            return
+            return val
 
 
 def linear_search(target, vals):   
@@ -254,32 +264,36 @@ def linear_search(target, vals):
         if val == target:
             return target    
         
-def run_test(use_binary_search, n, el):
-    randoms = [random.randrange(1, 50, 1) for i in range(n - el)] 
-    search_randoms = [random.randrange(1, 50, 1) for i in range(el)] 
-    
-    randoms += search_randoms
-
+def run_test(use_binary_search, randoms, search_randoms):
     start_time = time.time()
+    el = len(search_randoms)
 
     if use_binary_search:
         merge_sort(randoms)
- 
-        for search_random in search_randoms:
+                        
+        for i, search_random in enumerate(search_randoms):
             binary_search(search_random, randoms)
-
+            printProgressBar(i + 1, el, prefix = 'Binary Progress:', suffix = 'Complete', length = 50)
     else:
-        for search_random in search_randoms:
+        for i, search_random in enumerate(search_randoms):
             linear_search(search_random, randoms)
+            printProgressBar(i + 1, el, prefix = 'Linear Progress:', suffix = 'Complete', length = 50)
 
     total_time = time.time() - start_time
     
     return total_time
 
-n = 1000000
-el = 1
+n = 100000
 
-print("Binary Search Tree:", run_test(True, n, el))
-print("Linear Search:", run_test(False, n, el))
+# randoms = [random.random() for x in range(n)]
 
+randoms = [random.randint(0, 100) for x in range(n)]
+
+search_randoms = [random.choice(randoms) for x in range(50000)] 
+
+t1 = run_test(False, randoms, search_randoms)
+t2 = run_test(True, randoms, search_randoms)
+
+print("Linear Search:", t1)
+print("Binary Search Tree:", t2)
 
