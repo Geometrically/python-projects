@@ -260,9 +260,9 @@ def binary_search(val, vals):
 
 
 def linear_search(target, vals):   
-    for val in vals:
-        if val == target:
-            return target    
+    for i in range(len(vals)):
+        if vals[i] == target:
+            return i    
         
 def run_test(use_binary_search, randoms, search_randoms):
     start_time = time.time()
@@ -287,13 +287,22 @@ n = 100000
 
 # randoms = [random.random() for x in range(n)]
 
-randoms = [random.randint(0, 100) for x in range(n)]
+close_value = True
+current_el = 5000
 
-search_randoms = [random.choice(randoms) for x in range(50000)] 
+while close_value:
+    randoms = [random.randint(1, n) for x in range(n)]
 
-t1 = run_test(False, randoms, search_randoms)
-t2 = run_test(True, randoms, search_randoms)
+    search_randoms = [random.choice(randoms) for x in range(10500)] 
 
-print("Linear Search:", t1)
-print("Binary Search Tree:", t2)
-
+    t1 = run_test(False, randoms, search_randoms)
+    t2 = run_test(True, randoms, search_randoms)
+    
+    print("Linear Search:", t1)
+    print("Binary Search Tree:", t2)
+    print("El", current_el)
+    
+    if abs(t2 - t1) < 1:
+        close_value = False
+    
+    current_el += 50
