@@ -5,7 +5,7 @@ import sys
 
 random.seed()
 
- 
+
 def insertion_sort(vals):
     for i in range(1, len(vals)):
         j = i
@@ -13,7 +13,7 @@ def insertion_sort(vals):
             vals[j], vals[j - 1] = vals[j - 1], vals[j]
             j -= 1
 
- 
+
 def bubble_sort(vals):
     n = len(vals)
     swapCompleted = True
@@ -23,8 +23,8 @@ def bubble_sort(vals):
             if vals[i] > vals[i + 1]:
                 vals[i], vals[i + 1] = vals[i + 1], vals[i]
                 swapCompleted = True
- 
- 
+
+
 def better_bubble_sort(vals):
     n = len(vals)
     swapCompleted = True
@@ -36,7 +36,7 @@ def better_bubble_sort(vals):
                 swapCompleted = True
         n -= 1
 
- 
+
 def even_better_bubble_sort(vals):
     n = len(vals)
     while n > 0:
@@ -47,7 +47,7 @@ def even_better_bubble_sort(vals):
                 new_n = i + 1
         n = new_n
 
- 
+
 def selection_sort(vals):
     for i in range(len(vals)):
         minIndex = i
@@ -55,7 +55,7 @@ def selection_sort(vals):
             if vals[j] < vals[minIndex]: minIndex = j
         if minIndex != i: vals[i], vals[minIndex] = vals[minIndex], vals[i]
 
- 
+
 def comb_sort(vals):
     gap = len(vals)
     shrink = 1.3
@@ -72,7 +72,7 @@ def comb_sort(vals):
                 vals[i], vals[i + gap] = vals[i + gap], vals[i]
                 doneSorting = False
 
- 
+
 def merge_sort(vals):
     if len(vals) > 1:
         firstHalf = vals[:len(vals) // 2]
@@ -97,7 +97,7 @@ def merge_sort(vals):
                     vals.append(secondHalf[j])
                     j += 1
 
- 
+
 def better_merge_sort(vals):
     better_merge_sort_helper(vals, 0, len(vals) - 1)
 
@@ -126,7 +126,7 @@ def better_merge_sort_helper(vals, low, high):
                     j += 1
         vals[low:high + 1] = nvals[:]
 
- 
+
 def quick_sort(vals):
     swaps = 0
     comparisons = 0
@@ -173,7 +173,7 @@ def partition(vals, low, high, swaps, comparisons):
         vals[i + 1], vals[high] = vals[high], vals[i + 1]
     return i + 1, swaps, comparisons
 
- 
+
 def heap_sort(vals):
     heapify(vals)
     for i in range(len(vals) - 1, -1, -1):
@@ -205,7 +205,8 @@ def sift_up(vals, start, end):
         if vals[parent] < vals[child]:
             vals[parent], vals[child] = vals[child], vals[parent]
             child = parent
-        else: return
+        else:
+            return
 
 
 def sift_down(vals, start, end):
@@ -223,34 +224,35 @@ def sift_down(vals, start, end):
             vals[root], vals[swap] = vals[swap], vals[root]
             root = swap
 
- 
+
 def bin_index(vals, searchVal):
     i = bisect.bisect_left(vals, searchVal)
     if i != len(vals) and vals[i] == searchVal:
         return i
     else:
         raise ValueError
-       
+
+
 # MY CODE BELOW
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
-    
+def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+
     for i in range(100):
         print()
-        
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
+
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end="\r")
+
 
 def binary_search(val, vals):
     done = False
-    
+
     current_vals = vals
-    
+
     while not done:
         half = len(current_vals) // 2 if len(current_vals) > 1 else 0
-        
+
         if current_vals[half] < val:
             current_vals = current_vals[half:]
         elif current_vals[half] > val:
@@ -259,50 +261,49 @@ def binary_search(val, vals):
             return val
 
 
-def linear_search(target, vals):   
+def linear_search(target, vals):
     for i in range(len(vals)):
         if vals[i] == target:
-            return i    
-        
-def run_test(use_binary_search, randoms, search_randoms):
+            return i
+
+
+def run_test(use_binary_search, randoms, search_randoms, use_progress_bar=False):
     start_time = time.time()
     el = len(search_randoms)
 
     if use_binary_search:
         merge_sort(randoms)
-                        
+
         for i, search_random in enumerate(search_randoms):
             binary_search(search_random, randoms)
-            printProgressBar(i + 1, el, prefix = 'Binary Progress:', suffix = 'Complete', length = 50)
+
+            if use_progress_bar:
+                print_progress_bar(i + 1, el, prefix='Binary Progress:', suffix='Complete', length=50)
     else:
         for i, search_random in enumerate(search_randoms):
             linear_search(search_random, randoms)
-            printProgressBar(i + 1, el, prefix = 'Linear Progress:', suffix = 'Complete', length = 50)
+
+            if use_progress_bar:
+                print_progress_bar(i + 1, el, prefix='Linear Progress:', suffix='Complete', length=50)
 
     total_time = time.time() - start_time
-    
+
     return total_time
+
 
 n = 100000
 
 # randoms = [random.random() for x in range(n)]
 
 close_value = True
-current_el = 5000
+current_el = 800
 
-while close_value:
-    randoms = [random.randint(1, n) for x in range(n)]
+randoms = [random.randint(1, n) for x in range(n)]
 
-    search_randoms = [random.choice(randoms) for x in range(10500)] 
+search_randoms = [random.choice(randoms) for x in range(current_el)]
 
-    t1 = run_test(False, randoms, search_randoms)
-    t2 = run_test(True, randoms, search_randoms)
-    
-    print("Linear Search:", t1)
-    print("Binary Search Tree:", t2)
-    print("El", current_el)
-    
-    if abs(t2 - t1) < 1:
-        close_value = False
-    
-    current_el += 50
+t1 = run_test(False, randoms, search_randoms)
+t2 = run_test(True, randoms, search_randoms)
+
+print("Linear Search:", t1)
+print("Binary Search Tree:", t2)
