@@ -234,12 +234,16 @@ def bin_index(vals, searchVal):
 
 
 # MY CODE BELOW
+
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1", "ya", "sure", "y")
+
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filled_length = int(length * iteration // total)
     bar = fill * filled_length + '-' * (length - filled_length)
 
-    for i in range(100):
+    for i in range(10):
         print()
 
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end="\r")
@@ -291,19 +295,21 @@ def run_test(use_binary_search, randoms, search_randoms, use_progress_bar=False)
     return total_time
 
 
-n = 100000
+n = int(input("Welcome to Search and Sort! \nHow many numbers would you like in your randomly generated list?: "))
 
-# randoms = [random.random() for x in range(n)]
+if input("Would you like to use a random list of floats(type f) or a random list of ints(type i)?: ") == "f":
+    randoms = [random.random() for x in range(n)]
+else:
+    randoms = [random.randint(1, n) for x in range(n)]
 
-close_value = True
-current_el = 800
-
-randoms = [random.randint(1, n) for x in range(n)]
+current_el = int(input("How many numbers would you to search for?: "))
 
 search_randoms = [random.choice(randoms) for x in range(current_el)]
 
-t1 = run_test(False, randoms, search_randoms)
-t2 = run_test(True, randoms, search_randoms)
+use_progress_bar = str2bool(input("Would you like to use our fancy progress bar? This does slow down search times! (y/n): "))
+
+t1 = run_test(False, randoms, search_randoms, use_progress_bar)
+t2 = run_test(True, randoms, search_randoms, use_progress_bar)
 
 print("Linear Search:", t1)
 print("Binary Search Tree:", t2)
