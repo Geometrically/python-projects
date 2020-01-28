@@ -2,18 +2,10 @@ import turtle
 from collections import namedtuple
 import random
 import math
+from math import sqrt
 
-def distance(a, b):
-    if (a == b):
-        return 0
-    elif (a < 0) and (b < 0) or (a > 0) and (b > 0):
-        if (a < b):
-            return (abs(abs(a) - abs(b)))
-        else:
-            return -(abs(abs(a) - abs(b)))
-    else:
-        return math.copysign((abs(a) + abs(b)),b)
-
+def distance(x1, x2, y1, y2):
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)  
 
 def move_left():
     global moving_left
@@ -65,11 +57,26 @@ def on_click(x, y):
 
 def spawn_enemy():
     spawn_square()
-    screen.ontimer(spawn_enemy, random.randint(600, 900))
+    
+    if not game_over:
+        screen.ontimer(spawn_enemy, random.randint(600, 900))
 
 def update_screen():
+    global game_over
+        
     for current_enemy in current_enemies: 
-        current_enemy.forward(10)
+        if current_enemy.ycor() < 0:
+            current_enemy.hideturtle()
+            current_enemies.remove(current_enemy)
+        else:
+            if distance(current_enemy.xcor(), player.xcor(), current_enemy.ycor(), player.ycor()) < 30:
+                game_over = True
+                player.goto(250, 250)
+                player.hideturtle()
+                player.write("Game Over!", align="center" ,font=("Arial", 20, "normal"))
+            else:
+                current_enemy.shapesize(0.1 + (400 - current_enemy.xcor())/400)
+                current_enemy.forward(10)
     
     if moving_left:
         player.setheading(180)
@@ -79,8 +86,8 @@ def update_screen():
         player.setheading(0)
         player.forward(10)
         
-        
-    screen.ontimer(update_screen, 5)
+    if not game_over:   
+        screen.ontimer(update_screen, 5)
 
 screen = turtle.Screen()
 screen.screensize(700, 700)
@@ -94,11 +101,13 @@ current_enemies = []
 moving_left = False
 moving_right = False
 
+game_over = False
+
 player = turtle.Turtle()
 
 player.shape("triangle")
 player.up()
-player.shapesize(3, 3)
+player.shapesize(3)
 player.speed(0)
 player.goto(250, 100)
 player.speed(0)
