@@ -75,15 +75,7 @@ def move_enemy(enemy):
         enemy.shapesize(0.5 + (250 - enemy.ycor())*2/250)
         enemy.forward(5)
 
-def move_player(): 
-    if moving_left:
-        player.setheading(180)
-        player.forward(10)
     
-    if moving_right:
-        player.setheading(0)
-        player.forward(10)
-        
 def update_screen():
     global game_over, score
     
@@ -100,10 +92,17 @@ def update_screen():
             
             gc.collect()
         else:
-            threading.Thread(target=move_enemy, args=(current_enemy,)).start()
+            move_enemy(current_enemy)
     
     
-        
+    if moving_left:
+        player.setheading(180)
+        player.forward(10)
+    
+    if moving_right:
+        player.setheading(0)
+        player.forward(10)
+    
     if not game_over:   
         screen.ontimer(update_screen, 1)
 
@@ -161,6 +160,5 @@ screen.listen()
 
 screen.ontimer(spawn_square, 500)
 screen.ontimer(update_screen, 1)
-screen.ontimer(move_player, 1)
 
 screen.mainloop()
