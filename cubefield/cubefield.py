@@ -2,8 +2,8 @@ import turtle
 from collections import namedtuple
 import random
 import math
-import threading
-
+import asyncturtle
+import asyncio
 import gc
 
 
@@ -35,7 +35,9 @@ def spawn_square():
     
     xPos = random.randint(100, 400)
     
-    square = turtle.Turtle()
+    tasks = []
+    
+    square = asyncturtle.AsyncTurtle()
     
     square.shape("square")
     square.up()
@@ -44,10 +46,12 @@ def spawn_square():
     square.color((252 - score//5) % 255, (186 - score//5) % 255, (3 + score//5) % 255)
     square.hideturtle()
     square.speed(0)
-    square.goto(xPos, 250)
+    tasks.append(square.goto(xPos, 250))
     square.shapesize(0.5)
     square.showturtle()
-    square.setheading(270)
+    tasks.append(square.setheading(270))
+    
+    loop.run_until_complete(asyncio.wait(tasks))
     
     current_enemies.append(square)
     
@@ -82,18 +86,11 @@ def update_screen():
     score += 1
     scoreWriter.clear()
     scoreWriter.write(score, align="center" ,font=("Arial", 20, "normal"))
-        
-    for current_enemy in current_enemies: 
-        if current_enemy.ycor() < 0:
-            current_enemy.hideturtle()
-            current_enemies.remove(current_enemy)
-            
-            del current_enemy
-            
-            gc.collect()
-        else:
-            move_enemy(current_enemy)
     
+    tasks = [enemy.forward(10) for enemy in current_enemies]
+    
+    if len(tasks) > 0:
+        loop.run_until_complete(asyncio.wait(tasks))
     
     if moving_left:
         player.setheading(180)
@@ -121,6 +118,8 @@ moving_right = False
 game_over = False
 
 score = 0
+
+loop = asyncio.get_event_loop()
 
 player = turtle.Turtle()
 
