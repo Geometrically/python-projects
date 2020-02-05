@@ -30,33 +30,6 @@ def stop_move_right():
     
     moving_right = False
 
-def spawn_square():
-    global current_enemies
-    
-    xPos = random.randint(100, 400)
-    
-    tasks = []
-    
-    square = asyncturtle.AsyncTurtle()
-    
-    square.shape("square")
-    square.up()
-    square.shapesize(1, 1)
-    
-    square.color((252 - score//5) % 255, (186 - score//5) % 255, (3 + score//5) % 255)
-    square.hideturtle()
-    square.speed(0)
-    tasks.append(square.goto(xPos, 250))
-    square.shapesize(0.5)
-    square.showturtle()
-    tasks.append(square.setheading(270))
-    
-    loop.run_until_complete(asyncio.wait(tasks))
-    
-    current_enemies.append(square)
-    
-    screen.ontimer(spawn_square, abs(1000 - (score//500)*100))
-
     
 def on_click(x, y):
     global current_buttons
@@ -66,19 +39,6 @@ def on_click(x, y):
             button.on_click()
             current_buttons.remove(button)
             return
-
-def move_enemy(enemy):
-    global game_over
-
-    if distance(enemy.xcor(), player.xcor(), enemy.ycor(), player.ycor()) < 30:
-        game_over = True
-        player.goto(250, 250)
-        player.hideturtle()
-        player.write("Game Over!", align="center" ,font=("Arial", 20, "normal"))
-    else:
-        enemy.shapesize(0.5 + (250 - enemy.ycor())*2/250)
-        enemy.forward(5)
-
     
 def update_screen():
     global game_over, score
@@ -87,7 +47,37 @@ def update_screen():
     scoreWriter.clear()
     scoreWriter.write(score, align="center" ,font=("Arial", 20, "normal"))
     
-    tasks = [enemy.forward(10) for enemy in current_enemies]
+    tasks = []
+    
+    if score % 5 == 0:
+        xPos = random.randint(100, 400)
+
+        square = asyncturtle.AsyncTurtle()
+    
+        square.shape("square")
+        square.up()
+        square.shapesize(0.5)
+        square.color((252 - score//5) % 255, (186 - score//5) % 255, (3 + score//5) % 255)
+        square.hideturtle()
+        square.speed(0)
+        tasks.append(square.goto(xPos, 250))
+        square.showturtle()
+        tasks.append(square.setheading(270))
+        square.goto(xPos, -1)
+        
+        current_enemies.append(square)
+    
+#     for current_enemy in current_enemies:
+#         if distance(current_enemy.xcor(), player.xcor(), current_enemy.ycor(), player.ycor()) < 30:
+#             game_over = True
+#             player.goto(250, 250)
+#             player.hideturtle()
+#             player.write("Game Over!", align="center" ,font=("Arial", 20, "normal"))
+#         else:
+#             tasks.append(current_enemy.forward(10))
+#             current_enemy.shapesize(0.5 + (250 - current_enemy.ycor())*2/250)
+    
+    tasks += [enemy.forward(10) for enemy in current_enemies]
     
     if len(tasks) > 0:
         loop.run_until_complete(asyncio.wait(tasks))
@@ -157,7 +147,6 @@ screen.colormode(255)
     
 screen.listen()
 
-screen.ontimer(spawn_square, 500)
 screen.ontimer(update_screen, 1)
 
 screen.mainloop()
