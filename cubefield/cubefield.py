@@ -50,15 +50,15 @@ def update_screen():
     tasks = []
     
     if score % 5 == 0:
-        xPos = random.randint(100, 400)
+        xPos = random.randint(0, 500)
 
         square = asyncturtle.AsyncTurtle()
     
         square.shape("square")
         square.up()
-        square.shapesize(0.5)
-        square.color((252 - score//5) % 255, (186 - score//5) % 255, (3 + score//5) % 255)
+        square.shapesize(0.1)
         square.hideturtle()
+        square.color((252 - score//5) % 255, (186 - score//5) % 255, (3 + score//5) % 255)
         square.speed(0)
         tasks.append(square.goto(xPos, 250))
         square.showturtle()
@@ -67,26 +67,32 @@ def update_screen():
         
         current_enemies.append(square)
     
-#     for current_enemy in current_enemies:
-#         if distance(current_enemy.xcor(), player.xcor(), current_enemy.ycor(), player.ycor()) < 30:
-#             game_over = True
-#             player.goto(250, 250)
-#             player.hideturtle()
-#             player.write("Game Over!", align="center" ,font=("Arial", 20, "normal"))
-#         else:
-#             tasks.append(current_enemy.forward(10))
-#             current_enemy.shapesize(0.5 + (250 - current_enemy.ycor())*2/250)
+    for current_enemy in current_enemies:
+        if distance(current_enemy.xcor(), player.xcor(), current_enemy.ycor(), player.ycor()) < 20:
+            game_over = True
+            player.goto(250, 250)
+            player.hideturtle()
+            player.write("Game Over!", align="center" ,font=("Arial", 20, "normal"))
+        else:
+            if current_enemy.ycor() < 0:
+                current_enemies.remove(current_enemy)
+                current_enemy.hideturtle()
+                del current_enemy
+                gc.collect()
+            else:
+                tasks.append(current_enemy.forward(1 + score//50))
+                current_enemy.shapesize(0.5 + (250 - current_enemy.ycor())*2/250)
     
     tasks += [enemy.forward(10) for enemy in current_enemies]
     
     if len(tasks) > 0:
         loop.run_until_complete(asyncio.wait(tasks))
     
-    if moving_left:
+    if moving_left and player.xcor() > 0:
         player.setheading(180)
         player.forward(10)
     
-    if moving_right:
+    if moving_right and player.xcor() < 500:
         player.setheading(0)
         player.forward(10)
     
