@@ -12,27 +12,24 @@ def distance(x1, x2, y1, y2):
 
 
 def move_left():
-    global moving_left
+    global moving_left = True
 
-    moving_left = True
+  
 
 
 def stop_move_left():
-    global moving_left
+    global moving_left = False
 
-    moving_left = False
-
-
+    
 def move_right():
-    global moving_right
+    global moving_right = True
 
-    moving_right = True
 
 
 def stop_move_right():
-    global moving_right
+    global moving_right = False
 
-    moving_right = False
+    
 
 
 def on_click(x, y):
@@ -42,7 +39,7 @@ def on_click(x, y):
         if button.x1 < x < button.x2 and button.y1 < y < button.y2:
             button.on_click()
             current_buttons.remove(button)
-            return
+            return 
 
 
 def restart():
