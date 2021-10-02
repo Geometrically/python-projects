@@ -111,13 +111,13 @@ def drawJackOnJack(cols, rows, brickWidth, brickHeight, mortarWidth, xOffset=0, 
             drawRect(x, y, brickWidth, brickHeight)
 
 
-# Half Basket Weave - https://i.imgur.com/qULVWK0.png
+# Half Basket Weave
 # drawHalfBasketWeave(10, 10, 30, 5)
-# Basket Weave - https://i.imgur.com/G7REEpz.png
+# Basket Weave
 # drawBasketWeave(10, 10, 30, 5)
-# Running Weave - https://i.imgur.com/HUPddwU.png
+# Running Weave
 # drawRunningWeave(10, 10, 30, 15, 5)
-# Jack On Jack - https://i.imgur.com/6ZTI14C.png
+# Jack On Jack
 # drawJackOnJack(10, 10, 30, 15, 5)
 
 turtle.done()
